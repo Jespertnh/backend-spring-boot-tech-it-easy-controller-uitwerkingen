@@ -9,37 +9,42 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4.2.2
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3.10.0
+      - name: Convert repository name to lowercase
+        run: |
+          LOWER_REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "REPOSITORY_LOWER=$LOWER_REPO" >> $GITHUB_ENV
 
-    - name: Login to GitHub Container Registry
-      uses: docker/login-action@v3.4.0
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.10.0
 
-    - name: Build and push
-      uses: docker/build-push-action@v6.15.0
-      with:
-        context: .
-        push: true
-        tags: ghcr.io/${{ github.repository }}:${{ github.sha }}
-        cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:latest
-        cache-to: type=inline
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Image metadata
-      id: meta
-      uses: docker/metadata-action@v5.7.0
-      with:
-        images: ghcr.io/${{ github.repository }}
+      - name: Build and push
+        uses: docker/build-push-action@v6.15.0
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ env.REPOSITORY_LOWER }}:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/${{ env.REPOSITORY_LOWER }}:latest
+          cache-to: type=inline
 
-    - name: Push to GitHub Container Registry
-      uses: docker/build-push-action@v6.15.0
-      with:
-        context: .
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+      - name: Image metadata
+        id: meta
+        uses: docker/metadata-action@v5.7.0
+        with:
+          images: ghcr.io/${{ env.REPOSITORY_LOWER }}
+
+      - name: Push to GitHub Container Registry
+        uses: docker/build-push-action@v6.15.0
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
