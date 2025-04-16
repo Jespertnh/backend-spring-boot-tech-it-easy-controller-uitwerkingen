@@ -56,7 +56,7 @@ jobs:
           token: ${{ secrets.DO_API_TOKEN }}
 
       - name: Configure kubectl
-        run: doctl kubernetes cluster kubeconfig save do-ams3-jcluster
+        run: doctl kubernetes cluster kubeconfig save jcluster
 
       - name: Deploy to Kubernetes
         run: |
