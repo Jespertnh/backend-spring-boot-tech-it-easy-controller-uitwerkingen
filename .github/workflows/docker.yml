@@ -48,3 +48,16 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      # ----------------- Deployment Steps -----------------
+      - name: Set up doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_API_TOKEN }}
+
+      - name: Configure kubectl
+        run: doctl kubernetes cluster kubeconfig save do-ams3-jcluster
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl set image deployment/jdeployment jdeployment=ghcr.io/${{ env.REPOSITORY_LOWER }}:${{ github.sha }} --record
