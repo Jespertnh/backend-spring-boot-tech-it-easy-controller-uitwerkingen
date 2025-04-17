@@ -9,7 +9,7 @@ public class TelevisionController {
 
     @GetMapping("/")
     public ResponseEntity<String> getHello() {
-        return ResponseEntity.ok("Hello hello hello")
+        return ResponseEntity.ok("Hello hello hello");
     }
     
 
