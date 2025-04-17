@@ -7,6 +7,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class TelevisionController {
 
+    @GetMapping("/")
+    public ResponseEntity<String> getHello() {
+        return ResponseEntity.ok("Hello hello hello")
+    }
+    
+
     @GetMapping("/televisions")
     public ResponseEntity<String> getAllTelevisions() {
 
